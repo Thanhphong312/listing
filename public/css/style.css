@@ -1,0 +1,185 @@
+/* .modal-content{width: 1200px;} */
+.page_conten_page {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    background: #fff;
+}
+
+.page_conten_page .row {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.owl-carousel.owl-theme .owl-stage {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap
+}
+.none-pargin .owl-dots {
+    display: none
+}
+
+.owl-carousel.owl-theme {
+    float: left;
+}
+
+.owl-item.active {
+    background: initial;
+}
+
+.owl-images-pro-child .owl-prev {
+    left: 0;
+    border-radius: 5px 0 0 5px;
+    background: url(../img/pro_slide_prev.png) no-repeat center center #f4f4f4
+}
+
+.owl-images-pro-child .owl-next {
+    right: 0px;
+    border-radius: 0 5px 5px 0;
+    background: url(../img/pro_slide_next.png) no-repeat center center #f4f4f4;
+}
+
+.owl-images-pro-child .owl-next,
+.owl-images-pro-child .owl-prev {
+    position: absolute;
+    width: 12px;
+    border: solid 1px #ccc;
+    bottom: 50%;
+    height: 50px;
+    margin-bottom: -25px;
+    text-indent: -10000px;
+}
+
+#bridal_images_list li {
+    margin: 5px;
+    height: calc(100% - 10px) !important;
+    width: calc(100% - 10px) !important;
+    box-sizing: border-box;
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    list-style: none;
+    float: left;
+    border: 1px solid #CCC;
+    background: #fff;
+    padding: 4px;
+    text-align: center;
+}
+
+#bridal_images {
+    border: 1px solid #CCC;
+    background: #fff;
+    padding: 5px;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    box-sizing: border-box
+}
+
+#bridal_images img {
+    border: none;
+    width: 100% !important;
+    height: auto;
+    margin: 0 auto
+}
+
+#bridal_images_list {
+    display: block;
+    width: 100%;
+    position: relative;
+}
+
+#bridal_images_list img {
+    height: 100% !important;
+    width: 100%;
+    border: none;
+}
+
+#pro_img_slide{
+    padding: 0;
+}
+
+.product-gallery {
+    width: 45%;
+    float: left;
+    position: relative;
+    z-index: 0;
+}
+
+.product-info {
+    width: 45%;
+    float: left;
+    margin-right: 30px;
+    margin-left: 30px;
+    padding-top: 10px;
+}
+
+h1.product-title {
+    font-weight: 300!important;
+    color: #111!important;
+}
+
+span.amount {
+    color: #111;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.product-info .price {
+    font-size: 30px;
+    font-weight: bolder;
+    margin: 0.5em 0;
+}
+
+.product-info .woocommerce-Price-currencySymbol {
+    font-size: 1em;
+    vertical-align: inherit;
+}
+
+#dt_variation{float: left;}
+
+.variations {
+    position: relative;
+}
+
+.variations td {
+    vertical-align: middle;
+    border: 0;
+    padding: 0.2em 0;
+    letter-spacing: normal;
+    text-transform: none;
+}
+.variable-items-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.product-info .variable-items-wrapper .variable-item {
+    list-style: none;
+    -webkit-transition: all .2s ease;
+    transition: all .2s ease;
+    position: relative;
+    border-radius: 2px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.3);
+    height: 27px;
+    margin: 4px 12px 4px 0;
+    padding: 8px;
+}
+
+.product-info .variable-items-wrapper .variable-item.selected {
+    -webkit-box-shadow: 0 0 0 3px red!important;
+    box-shadow: 0 0 0 3px red!important;
+}

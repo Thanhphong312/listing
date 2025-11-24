@@ -1,0 +1,18 @@
+<?php
+
+namespace Vanguard\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Categories extends Model
+{
+    use HasFactory;
+    protected $table = "categories";
+    protected $fillable = [
+        'id','name','status'
+    ];
+    public function categoryDesignItems(){
+        return $this->hasMany(CategoryDesignItems::class, 'design_item_id','id');
+    }
+}

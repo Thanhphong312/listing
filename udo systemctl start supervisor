@@ -1,0 +1,15 @@
+○ supervisor.service - Supervisor process control system for UNIX
+     Loaded: loaded (]8;;file://felinephong/usr/lib/systemd/system/supervisor.service/usr/lib/systemd/system/supervisor.service]8;;; [0;1;38;5;185mdisabled[0m; preset: [0;1;32menabled[0m)
+     Active: inactive (dead)
+       Docs: ]8;;http://supervisord.orghttp://supervisord.org]8;;
+
+Oct 08 12:43:40 felinephong (visorctl)[606883]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185msupervisor.service: Referenced but unset environment variable evaluates to an empty string: OPTIONS[0m
+Oct 08 12:43:40 felinephong supervisorctl[606883]: Shut down
+Oct 08 12:43:40 felinephong supervisord[606427]: 2024-10-08 12:43:40,650 INFO waiting for sync-store-supover_0, upload-mockup-product_0, post-product-to-tiktok_0 to die
+Oct 08 12:43:40 felinephong supervisord[606427]: 2024-10-08 12:43:40,694 INFO stopped: post-product-to-tiktok_0 (exit status 0)
+Oct 08 12:43:40 felinephong supervisord[606427]: 2024-10-08 12:43:40,722 WARN received SIGTERM indicating exit request
+Oct 08 12:43:41 felinephong supervisord[606427]: 2024-10-08 12:43:41,724 INFO stopped: upload-mockup-product_0 (exit status 0)
+Oct 08 12:43:41 felinephong supervisord[606427]: 2024-10-08 12:43:41,745 INFO stopped: sync-store-supover_0 (exit status 0)
+Oct 08 12:43:41 felinephong systemd[1]: supervisor.service: Deactivated successfully.
+Oct 08 12:43:41 felinephong systemd[1]: Stopped supervisor.service - Supervisor process control system for UNIX.
+Oct 08 12:43:41 felinephong systemd[1]: supervisor.service: Consumed 1.559s CPU time, 135.8M memory peak, 0B memory swap peak.
