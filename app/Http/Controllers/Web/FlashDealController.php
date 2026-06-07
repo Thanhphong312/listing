@@ -63,7 +63,11 @@ class FlashDealController extends Controller
     public function showproduct(Request $request, $id)
     {
         $store_id = $request->store_id;
-        $query = ProductFlashdeals::query()->select('id', 'product_id', 'message', 'total_sku');
+        $query = ProductFlashdeals::query()
+            ->select('id', 'product_id', 'message', 'total_sku')
+            ->with(['tiktok' => function ($q) use ($store_id) {
+                $q->where('store_id', $store_id)->select('remote_id', 'title', 'store_id');
+            }]);
         $query->where('flashdeal_id', $request->id);
         $flashdealproducts = $query->get();
         $flashdeal = FlashDeals::select('activity_id', 'begin_time', 'end_time', 'promotion_name')->where('activity_id', $request->id)->first();
@@ -192,14 +196,68 @@ class FlashDealController extends Controller
     }
     public function delete(Request $request, $id)
     {
-        $productFlashdeals = ProductFlashdeals::where('id', $id)->first();
-        if($productFlashdeals){
-            $productFlashdeals->delete();
-            return response(json_encode(["message" => true, "data" => []]), 200);   
-        }
-        return response(json_encode(["message" => true, "data" =>""]), 404);
+        try {
+            $productFlashdeals = ProductFlashdeals::where('id', $id)->first();
+            if (!$productFlashdeals) {
+                return response(json_encode(["message" => false, "data" => "Not found"]), 404);
+            }
 
+            $flashdeal = FlashDeals::where('activity_id', $productFlashdeals->flashdeal_id)->first();
+            $store = Store::find($flashdeal->store_id);
+
+            $tiktok = (new ConnectAppPartnerService())->connectAppPartnerPostProduct($store)['client'];
+            $tiktok->useVersion(202406);
+            $promotion = $tiktok->Promotion;
+            $promotion->useVersion(202309);
+
+            $promotion->removeActivityProduct(
+                $productFlashdeals->flashdeal_id,
+                [$productFlashdeals->product_id],
+                []
+            );
+
+            ProductTiktoks::where('remote_id', $productFlashdeals->product_id)->update(['is_flashdeal' => 0]);
+            $productFlashdeals->delete();
+            return response(json_encode(["message" => true, "data" => []]), 200);
+        } catch (\Throwable $th) {
+            return response(json_encode(["message" => $th->getMessage(), "data" => []]), 400);
+        }
     }
+    public function deleteMulti(Request $request)
+    {
+        try {
+            $ids = $request->ids;
+            if (empty($ids)) {
+                return response(json_encode(["message" => false, "data" => "No IDs provided"]), 400);
+            }
+
+            $products = ProductFlashdeals::whereIn('id', $ids)->get();
+            if ($products->isEmpty()) {
+                return response(json_encode(["message" => false, "data" => "Not found"]), 404);
+            }
+
+            foreach ($products->groupBy('flashdeal_id') as $flashdeal_id => $groupProducts) {
+                $flashdeal = FlashDeals::where('activity_id', $flashdeal_id)->first();
+                $store = Store::find($flashdeal->store_id);
+
+                $tiktok = (new ConnectAppPartnerService())->connectAppPartnerPostProduct($store)['client'];
+                $tiktok->useVersion(202406);
+                $promotion = $tiktok->Promotion;
+                $promotion->useVersion(202309);
+
+                $productIds = $groupProducts->pluck('product_id')->toArray();
+                $promotion->removeActivityProduct($flashdeal_id, $productIds, []);
+
+                ProductTiktoks::whereIn('remote_id', $productIds)->update(['is_flashdeal' => 0]);
+            }
+
+            ProductFlashdeals::whereIn('id', $ids)->delete();
+            return response(json_encode(["message" => true, "data" => []]), 200);
+        } catch (\Throwable $th) {
+            return response(json_encode(["message" => $th->getMessage(), "data" => []]), 400);
+        }
+    }
+
     public function sync_flashdeal(Request $request, $store_id)
     {
         // dd($store_id);

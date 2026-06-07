@@ -107,7 +107,10 @@
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "audit": {
+            "block-insecure": false
+        }
     },
     "minimum-stability": "stable",
     "prefer-stable": true

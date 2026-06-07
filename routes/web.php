@@ -434,6 +434,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::any('/add', 'FlashDealController@add')->name('add');
         Route::any('/edit/{id}', 'FlashDealController@edit')->name('edit');
         Route::any('/delete/{id}', 'FlashDealController@delete')->name('delete');
+        Route::any('/delete-multi', 'FlashDealController@deleteMulti')->name('deleteMulti');
         Route::any('/upload', 'FlashDealController@upload')->name('upload');
         Route::any('/sync-flash-deal/{id}', 'FlashDealController@sync_flashdeal')->name('sync_flashdeal');
         Route::any('/sync-all-flash-deal', 'FlashDealController@sync_all_flashdeal')->name('sync_all_flashdeal');

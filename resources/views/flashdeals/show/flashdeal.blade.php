@@ -123,6 +123,60 @@
                     </div>
                 </div>
             </div>
+            <!-- Modal Remove Flashdeal Products -->
+            <div class="modal fade" id="modal_remove_fld">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content" style="width: 900px;">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Remove Flashdeal Products</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="remove_fld_alert" class="alert alert-danger" style="display:none"></div>
+                            <div class="mb-2">
+                                Selected: <strong><span id="remove_fld_count">0</span></strong> products
+                            </div>
+                            <table class="table table-striped table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="checkall_remove_fld" onclick="checkallRemoveFld(this)"></th>
+                                        <th>ID</th>
+                                        <th>Product ID</th>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($flashdealproducts as $fp)
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="remove_fld_cb" value="{{$fp->id}}" onchange="updateRemoveFldCount()">
+                                        </td>
+                                        <td>{{$fp->id}}</td>
+                                        <td>{{$fp->product_id}}</td>
+                                        <td>{{$fp->tiktok->title ?? ''}}</td>
+                                        <td>
+                                            @if($fp->message == 'success')
+                                                <span class="badge bg-success">success</span>
+                                            @else
+                                                <span class="badge bg-danger">{{$fp->message ?: 'pending'}}</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-danger" onclick="deleteSelectedFld()">
+                                <i class="fa fa-trash"></i> Delete Selected
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-8">
                     <span class="btn btn-primary m-2">TOTAL : {{$totalfld}}</span> - <span
@@ -130,6 +184,9 @@
                     <button class="btn btn-danger" onclick="reup()">Re up product flashdeal</button>
                     <button class="btn btn-primary" onclick="getproduct()">get product</button>
                     <button class="btn btn-success" onclick="syncproductflashdeal()">sync product flashdeal</button>
+                    <button class="btn btn-warning" onclick="$('#modal_remove_fld').modal('show')">
+                        <i class="fa fa-trash"></i> Remove Flashdeal Products
+                    </button>
                 </div>
             </div>
             <div class="row">
@@ -233,14 +290,10 @@
                 url: '../delete/' + id,
                 success: function (response) {
                     location.reload();
-                    // $('#flashdealproduct_' + id).html(response);
-                    // checkButtonFfGm(id);
                 },
                 error: function (xhr, status, error) {
-                    // if (store_type == 4) {
-                    //     alert('order load fail: Order ID:' + id);
-                    // }
-
+                    var msg = xhr.responseJSON ? xhr.responseJSON.message : error;
+                    alert('Xóa thất bại: ' + msg);
                 }
             });
     }
@@ -746,6 +799,41 @@
             error: function (response) {
                 // Handle the error, e.g., show an alert
                 alert(response.responseJSON.message);
+            }
+        });
+    }
+    function checkallRemoveFld(target) {
+        $('.remove_fld_cb').prop('checked', target.checked);
+        updateRemoveFldCount();
+    }
+    function updateRemoveFldCount() {
+        $('#remove_fld_count').text($('.remove_fld_cb:checked').length);
+    }
+    function deleteSelectedFld() {
+        var ids = [];
+        $('.remove_fld_cb:checked').each(function () {
+            ids.push($(this).val());
+        });
+        if (ids.length === 0) {
+            alert('Vui lòng chọn ít nhất 1 sản phẩm');
+            return;
+        }
+        if (!confirm('Xóa ' + ids.length + ' sản phẩm khỏi flashdeal?')) return;
+
+        $('#remove_fld_alert').hide();
+        $.ajax({
+            url: '../delete-multi',
+            method: 'POST',
+            data: {
+                _token: "{{ csrf_token() }}",
+                ids: ids,
+            },
+            success: function (response) {
+                location.reload();
+            },
+            error: function (xhr) {
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Lỗi không xác định';
+                $('#remove_fld_alert').text('Xóa thất bại: ' + msg).show();
             }
         });
     }
