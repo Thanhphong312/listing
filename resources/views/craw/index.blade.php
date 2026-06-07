@@ -87,7 +87,7 @@
                     <label for="proxyInput" class="form-label">Proxy (optional, e.g.,
                         http://user:pass@host:port)</label>
                     <input type="text" class="form-control" id="proxyInput" placeholder="http://user:pass@host:port"
-                        value="http://60ba176d09:LgQMPZcv@167.160.75.13:4444">
+                        value="">
                 </div>
 
                 <button id="crawlBtn" class="btn btn-primary mb-3" disabled>Crawl</button>

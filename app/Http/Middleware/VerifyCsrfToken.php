@@ -28,5 +28,6 @@ class VerifyCsrfToken extends BaseVerifier
         'metas/update',
         'api/*',
         '/saved-crawls',
+        'etsy-crawler'
     ];
 }

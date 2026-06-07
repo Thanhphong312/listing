@@ -29,10 +29,10 @@ class PostProductToStoreATiktok implements ShouldQueue
     {
         if(is_array($images)){
             foreach ($images as $image) {
-                $image->src = 'https://global24watermark.site/gen-water-mark?url=' . urlencode($image->src) . '&watermark=' . urlencode($wartermark);
+                $image->src = $image->src;
             }  
         }else{
-            $images = 'https://global24watermark.site/gen-water-mark?url=' . urlencode($images) . '&watermark=' . urlencode($wartermark);
+            $images = $images;
 
         }
         
@@ -41,10 +41,10 @@ class PostProductToStoreATiktok implements ShouldQueue
     {
         if(is_array($images)){
             foreach ($images as $image) {
-                $image = 'https://global24watermark.site/gen-water-mark?url=' . urlencode($image) . '&watermark=' . urlencode($wartermark);
+                $image = $image;
             }  
         }else{
-            $images = 'https://global24watermark.site/gen-water-mark?url=' . urlencode($images) . '&watermark=' . urlencode($wartermark);
+            $images = $images;
 
         }
         

@@ -57,8 +57,12 @@ class addProductFlashdealjob implements ShouldQueue, ShouldBeUnique
 
         if (!$productFlashdeals || ($productFlashdeals && $productFlashdeals->message != 'success')) {
             $store = Store::find($this->store_id);
-
-            $storetiktok = (new ConnectAppPartnerService())->connectAppPartner($store)['client'];
+            try {
+                $storetiktok = (new ConnectAppPartnerService())->connectAppPartner($store)['client'];
+            } catch (\Exception $e) {
+                \Log::channel('product-to-flashdeal')->error("Error finding store: " . $e->getMessage());
+                return;
+            }
 
             try {
                 $remote_id = $this->remote_id;
@@ -149,29 +153,34 @@ class addProductFlashdealjob implements ShouldQueue, ShouldBeUnique
                 \Log::channel('product-to-flashdeal')->info("success");
 
             } catch (\Throwable $th) {
-                $product = $storetiktok->Product->getProduct($this->remote_id);
+                try {
+                    $product = $storetiktok->Product->getProduct($this->remote_id);
 
-                $productFlashdeals = ProductFlashdeals::updateOrCreate([
-                    'flashdeal_id' => $this->activity_id,
-                    'product_id' => $this->remote_id,
-                ], [
-                    'discount' => $this->discount,
-                    'quantity_limit' => $this->quantity_limit,
-                    'quantity_per_user' => $this->quantity_per_user,
-                    'message' => "product status ".$product['status']." | " . $th->getMessage() . " | " . Carbon::now() 
-                ]);
-                if(str_contains($th->getMessage(), 'SKU cannot be in two') == true){
-                    $productFlashdeals = ProductFlashdeals::where('flashdeal_id', $this->activity_id)
-                        ->where('product_id',$this->remote_id)->first();
-                    $productFlashdeals->delete();
+                    $productFlashdeals = ProductFlashdeals::updateOrCreate([
+                        'flashdeal_id' => $this->activity_id,
+                        'product_id' => $this->remote_id,
+                    ], [
+                        'discount' => $this->discount,
+                        'quantity_limit' => $this->quantity_limit,
+                        'quantity_per_user' => $this->quantity_per_user,
+                        'message' => "product status ".$product['status']." | " . $th->getMessage() . " | " . Carbon::now() 
+                    ]);
+                    if(str_contains($th->getMessage(), 'SKU cannot be in two') == true){
+                        $productFlashdeals = ProductFlashdeals::where('flashdeal_id', $this->activity_id)
+                            ->where('product_id',$this->remote_id)->first();
+                        $productFlashdeals->delete();
+                    }
+                    \Log::channel('product-to-flashdeal')->info("store_id : " . $this->store_id);
+                    \Log::channel('product-to-flashdeal')->info("activity_id : " . $this->activity_id);
+                    \Log::channel('product-to-flashdeal')->info("remote_id : " . $this->remote_id);
+                    \Log::channel('product-to-flashdeal')->info("discount : " . $this->discount);
+                    \Log::channel('product-to-flashdeal')->info("quantity_limit : " . $this->quantity_limit);
+                    \Log::channel('product-to-flashdeal')->info("quantity_per_user : " . $this->quantity_per_user);
+                    \Log::channel('product-to-flashdeal')->info($th->getMessage());
+                } catch (\Exception $e) {
+                    return;
                 }
-                \Log::channel('product-to-flashdeal')->info("store_id : " . $this->store_id);
-                \Log::channel('product-to-flashdeal')->info("activity_id : " . $this->activity_id);
-                \Log::channel('product-to-flashdeal')->info("remote_id : " . $this->remote_id);
-                \Log::channel('product-to-flashdeal')->info("discount : " . $this->discount);
-                \Log::channel('product-to-flashdeal')->info("quantity_limit : " . $this->quantity_limit);
-                \Log::channel('product-to-flashdeal')->info("quantity_per_user : " . $this->quantity_per_user);
-                \Log::channel('product-to-flashdeal')->info($th->getMessage());
+                
 
             }
             \Log::channel('product-to-flashdeal')->info("end add product fld  ---------------------------------");

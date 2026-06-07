@@ -15,7 +15,7 @@
   <div class="col-12">
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Fulfill Dashboard</h5>
+        <h5 class="card-title mb-0">Fulfill ok</h5>
         <form class="d-flex">
           <select class="form-select form-select-sm">
             <option value="Pending">Today</option>

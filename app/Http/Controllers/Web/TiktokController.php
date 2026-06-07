@@ -140,12 +140,13 @@ class TiktokController extends Controller
     }
     public function test(Request $request, $id)
     {
-        $store = Store::find(1);
+        phpinfo();
+        // $store = Store::find(1);
 
-        $store->syncfld = 1;
-            $storetiktok = (new ConnectAppPartnerService())->connectAppPartner($store)['client'];
-            $product = $storetiktok->Product->getProduct(1731815324732067903);
-            dd($product);
+        // $store->syncfld = 1;
+        //     $storetiktok = (new ConnectAppPartnerService())->connectAppPartner($store)['client'];
+        //     $product = $storetiktok->Product->getProduct(1731815324732067903);
+        //     dd($product);
         // $storeproducts = StoreProducts::WHERENULL('remote_id')->WhereNotNull('message')->get();
         // foreach($storeproducts as $storeproduct){
         //     $id = $storeproduct->id;
