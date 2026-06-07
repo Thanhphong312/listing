@@ -206,13 +206,13 @@ class FlashDealController extends Controller
             $store = Store::find($flashdeal->store_id);
 
             $tiktok = (new ConnectAppPartnerService())->connectAppPartnerPostProduct($store)['client'];
-            $tiktok->useVersion(202406);
+            $tiktok->useVersion(202312);
             $promotion = $tiktok->Promotion;
             $promotion->useVersion(202309);
 
             $promotion->removeActivityProduct(
-                $productFlashdeals->flashdeal_id,
-                [$productFlashdeals->product_id],
+                (string) $productFlashdeals->flashdeal_id,
+                [(string) $productFlashdeals->product_id],
                 []
             );
 
@@ -241,12 +241,12 @@ class FlashDealController extends Controller
                 $store = Store::find($flashdeal->store_id);
 
                 $tiktok = (new ConnectAppPartnerService())->connectAppPartnerPostProduct($store)['client'];
-                $tiktok->useVersion(202406);
+                $tiktok->useVersion(202312);
                 $promotion = $tiktok->Promotion;
                 $promotion->useVersion(202309);
 
-                $productIds = $groupProducts->pluck('product_id')->toArray();
-                $promotion->removeActivityProduct($flashdeal_id, $productIds, []);
+                $productIds = $groupProducts->pluck('product_id')->map(fn($id) => (string) $id)->toArray();
+                $promotion->removeActivityProduct((string) $flashdeal_id, $productIds, []);
 
                 ProductTiktoks::whereIn('remote_id', $productIds)->update(['is_flashdeal' => 0]);
             }
