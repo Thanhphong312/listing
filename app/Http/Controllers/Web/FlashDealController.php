@@ -246,7 +246,11 @@ class FlashDealController extends Controller
                 $promotion->useVersion(202309);
 
                 $productIds = $groupProducts->pluck('product_id')->map(fn($id) => (string) $id)->toArray();
-                $promotion->removeActivityProduct((string) $flashdeal_id, $productIds, []);
+                try {
+                    $promotion->removeActivityProduct((string) $flashdeal_id, $productIds, []);
+                } catch (\Throwable $e) {
+                    // Nếu sản phẩm không tồn tại trong promotion thì bỏ qua, vẫn xoá khỏi DB
+                }
 
                 ProductTiktoks::whereIn('remote_id', $productIds)->update(['is_flashdeal' => 0]);
             }
