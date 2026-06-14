@@ -23,16 +23,15 @@ public function getProduct(Request $request)
     $listingId = $matches[1];
     $apiUrl = "https://www.etsy.com/api/v3/ajax/public/listings/{$listingId}";
 
+    $proxy = $this->normalizeProxy($proxy);
+
     // Gọi API với proxy US
     $response = Http::withHeaders([
             'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
             'Accept-Language' => 'en-US,en;q=0.9',
             'Accept' => 'application/json',
         ])
-        ->withOptions([
-            // Proxy US 
-            'proxy' => $proxy,
-        ])
+        ->withOptions(array_filter(['proxy' => $proxy]))
         ->get($apiUrl);
 
     if ($response->successful()) {
@@ -49,6 +48,25 @@ public function getProduct(Request $request)
 
     return response()->json(['error' => 'Failed to fetch listing data']);
 }
+private function normalizeProxy(?string $proxy): ?string
+{
+    if (!$proxy) return null;
+    // Already correct: http://user:pass@host:port
+    if (preg_match('/^https?:\/\/.+@.+:\d+$/', $proxy)) return $proxy;
+    // Format: http://host:port:user:pass
+    if (preg_match('/^https?:\/\/([^:]+):(\d+):([^:]+):(.+)$/', $proxy, $m)) {
+        return "http://{$m[3]}:{$m[4]}@{$m[1]}:{$m[2]}";
+    }
+    // Format: host:port:user:pass
+    $parts = explode(':', $proxy);
+    if (count($parts) === 4) {
+        [$host, $port, $user, $pass] = $parts;
+        return "http://{$user}:{$pass}@{$host}:{$port}";
+    }
+    if (count($parts) === 2) return "http://{$proxy}";
+    return $proxy;
+}
+
 public function index()
 {
     return view('craw.index');

@@ -85,3 +85,6 @@ Route::post('/etsy-crawler', 'EtsyController@getProduct');
 Route::get('/crawls/{id}/images', 'EtsyController@getProductImages');
 Route::get('/search', 'EtsyController@searchProducts')->name('searchProducts');
 
+Route::post('/tiktok-crawl', '\Vanguard\Http\Controllers\Web\TiktokCrawlController@getProduct');
+Route::post('/tiktok-crawl-import', '\Vanguard\Http\Controllers\Web\TiktokCrawlController@importFromBrowser');
+

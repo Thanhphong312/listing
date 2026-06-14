@@ -511,3 +511,9 @@ Route::prefix('etsy-crawler')->group(function () {
     Route::post('/save-product', 'EtsyController@store');
 });
 
+Route::prefix('tiktok-crawl')->group(function () {
+    Route::get('/', 'TiktokCrawlController@index')->name('tiktok-crawl');
+    Route::post('/fetch', 'TiktokCrawlController@getProduct');
+    Route::post('/save-product', 'TiktokCrawlController@store');
+});
+

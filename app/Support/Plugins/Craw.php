@@ -9,10 +9,20 @@ class Craw extends Plugin
 {
     public function sidebar()
     {
-        return Item::create(__('Craw'))
-            ->route('etsy-crawler')
-            ->icon('fas fa-palette')
-            ->active("etsy-crawler*")
-            ->permissions('craw.manage');
+        return Item::create(__('Crawl'))
+            ->icon('fas fa-spider')
+            ->permissions('craw.manage')
+            ->addChildren([
+                Item::create(__('Etsy Crawler'))
+                    ->route('etsy-crawler')
+                    ->icon('fas fa-store')
+                    ->active('etsy-crawler*')
+                    ->permissions('craw.manage'),
+                Item::create(__('TikTok Crawler'))
+                    ->route('tiktok-crawl')
+                    ->icon('fab fa-tiktok')
+                    ->active('tiktok-crawl*')
+                    ->permissions('craw.manage'),
+            ]);
     }
 }

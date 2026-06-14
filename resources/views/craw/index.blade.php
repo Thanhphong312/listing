@@ -103,7 +103,10 @@
 
                 <div id="result" style="display:none;">
                     <h4>Product Info</h4>
-                    <p><strong>Title:</strong> <span id="title"></span></p>
+                    <div class="mb-2">
+                        <label for="title" class="form-label"><strong>Title:</strong></label>
+                        <input type="text" class="form-control" id="title">
+                    </div>
                     <p><strong>Listing ID:</strong> <span id="listing_id"></span></p>
                     <p><strong>Price:</strong> <span id="price"></span></p>
                     <p><strong>Description:</strong></p>
@@ -185,7 +188,7 @@
                 }
 
                 // Hiển thị dữ liệu
-                document.getElementById('title').innerText = data.title;
+                document.getElementById('title').value = data.title;
                 document.getElementById('price').innerText = `${data.price} ${data.currency_code}`;
                 document.getElementById('description').innerText = data.description ?? '';
                 document.getElementById('listing_id').innerText = data.listing_id ?? '';
@@ -357,7 +360,7 @@
             // Append các field text
             formData.append('_token', "{{ csrf_token() }}");
             formData.append('listing_id', $('#listing_id').text().trim());
-            formData.append('title', $('#title').text().trim());
+            formData.append('title', $('#title').val().trim());
             formData.append('description', $('#description').text().trim());
             formData.append('price', $('#price').text().trim().split(" ")[0]);
             formData.append('selectedtemplete', selectedtemplete);
@@ -389,7 +392,7 @@
             document.getElementById('result').style.display = 'none';
 
             // Clear các field
-            document.getElementById('title').innerText = '';
+            document.getElementById('title').value = '';
             document.getElementById('listing_id').innerText = '';
             document.getElementById('price').innerText = '';
             document.getElementById('description').innerText = '';
