@@ -109,8 +109,6 @@
                     </div>
                     <p><strong>Listing ID:</strong> <span id="listing_id"></span></p>
                     <p><strong>Price:</strong> <span id="price"></span></p>
-                    <p><strong>Description:</strong></p>
-                    <p id="description" class="form-control description-scroll"></p>
                     <h5>Images</h5>
                     <div id="images" class="d-flex flex-wrap"></div>
                     <div class="col-12 mt-2">
@@ -190,7 +188,6 @@
                 // Hiển thị dữ liệu
                 document.getElementById('title').value = data.title;
                 document.getElementById('price').innerText = `${data.price} ${data.currency_code}`;
-                document.getElementById('description').innerText = data.description ?? '';
                 document.getElementById('listing_id').innerText = data.listing_id ?? '';
 
 
@@ -361,7 +358,6 @@
             formData.append('_token', "{{ csrf_token() }}");
             formData.append('listing_id', $('#listing_id').text().trim());
             formData.append('title', $('#title').val().trim());
-            formData.append('description', $('#description').text().trim());
             formData.append('price', $('#price').text().trim().split(" ")[0]);
             formData.append('selectedtemplete', selectedtemplete);
 
@@ -395,7 +391,6 @@
             document.getElementById('title').value = '';
             document.getElementById('listing_id').innerText = '';
             document.getElementById('price').innerText = '';
-            document.getElementById('description').innerText = '';
             document.getElementById('images').innerHTML = '';
 
             // Reset input URL (nếu muốn clear luôn)
