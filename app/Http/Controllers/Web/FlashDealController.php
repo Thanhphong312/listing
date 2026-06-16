@@ -495,7 +495,8 @@ class FlashDealController extends Controller
             $begin_time = $now->addSecond()->timestamp;
             $end_time = $now->copy()->addSeconds($duration)->timestamp;
 
-            $title = substr($original->promotion_name . ' | Copy ' . Carbon::now()->format('d-m-y H:i:s'), 0, 50);
+            $suffix = '|C' . Carbon::now()->format('dHis'); // e.g. |C16143022 — 9 chars, always unique
+            $title = substr($original->promotion_name, 0, 50 - strlen($suffix)) . $suffix;
 
             $created = $promotion->createActivity(
                 $title,
