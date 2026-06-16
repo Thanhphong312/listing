@@ -6,6 +6,7 @@ use EcomPHP\TiktokShop\Resources\Product;
 use Illuminate\Http\Request;
 use Vanguard\Http\Controllers\Controller;
 use Vanguard\Jobs\addProductFlashdealjob;
+use Vanguard\Jobs\DuplicateFlashDealJob;
 use Vanguard\Jobs\RenewFlashDealJob;
 use Vanguard\Jobs\syncAllFlashDealJob;
 use Vanguard\Jobs\syncAllProductStoreFldJob;
@@ -472,6 +473,102 @@ class FlashDealController extends Controller
         $stores = Store::select('id', 'name_flashdeal')->where('create_flashdeal', 1)->get();
         return view('flashdeals.extention', compact('stores'));
     }
+    public function duplicateFld(Request $request, $id)
+    {
+        $original = FlashDeals::find($id);
+        if (!$original) {
+            return response()->json(['message' => false, 'error' => 'Not found'], 404);
+        }
+
+        try {
+            $store = Store::find($original->store_id);
+
+            $storetiktok = (new ConnectAppPartnerService())->connectAppPartnerPostProduct($store)['client'];
+            $storetiktok->useVersion(202406);
+            $promotion = $storetiktok->Promotion;
+            $promotion->useVersion(202309);
+
+            // Tạo flashdeal mới với cùng duration, bắt đầu ngay bây giờ
+            $now = Carbon::now();
+            $duration = Carbon::createFromTimestamp($original->begin_time)
+                ->diffInSeconds(Carbon::createFromTimestamp($original->end_time));
+            $begin_time = $now->addSecond()->timestamp;
+            $end_time = $now->copy()->addSeconds($duration)->timestamp;
+
+            $title = $original->promotion_name . ' | Copy ' . Carbon::now()->format('d-m-y H:i:s');
+
+            $created = $promotion->createActivity(
+                $title,
+                $original->activity_type,
+                $begin_time,
+                $end_time,
+                $original->product_level
+            );
+
+            $activity = $promotion->getActivity($created['activity_id']);
+
+            $newFld = FlashDeals::updateOrCreate(
+                ['activity_id' => $activity['activity_id']],
+                [
+                    'store_id'       => $original->store_id,
+                    'promotion_name' => $activity['title'],
+                    'activity_type'  => $activity['activity_type'],
+                    'product_level'  => $activity['product_level'],
+                    'status_fld'     => $activity['status'],
+                    'begin_time'     => $activity['begin_time'],
+                    'end_time'       => $activity['end_time'],
+                    'auto'           => $original->auto,
+                    'status'         => 1,
+                    'create_new'     => 1,
+                ]
+            );
+
+            // Copy products từ FLD cũ sang FLD mới
+            $products = ProductFlashdeals::where('flashdeal_id', $original->activity_id)->get();
+            foreach ($products as $pf) {
+                ProductFlashdeals::updateOrCreate(
+                    [
+                        'flashdeal_id' => (string) $newFld->activity_id,
+                        'product_id'   => $pf->product_id,
+                    ],
+                    [
+                        'discount'          => $pf->discount,
+                        'quantity_limit'    => $pf->quantity_limit,
+                        'quantity_per_user' => $pf->quantity_per_user,
+                        'total_sku'         => $pf->total_sku,
+                        'message'           => '',
+                        'success'           => 0,
+                    ]
+                );
+
+                addProductFlashdealjob::dispatch(
+                    $original->store_id,
+                    (string) $newFld->activity_id,
+                    $pf->product_id,
+                    $pf->discount,
+                    (int) $pf->quantity_limit,
+                    (int) $pf->quantity_per_user
+                )->onQueue('add-product-to-flashdeals');
+            }
+
+            // Deactivate FLD cũ
+            $promotion->deactivateActivity($original->activity_id);
+            $original->status_fld = 'DEACTIVATED';
+            $original->renew = 0;
+            $original->auto = 0;
+            $original->save();
+
+            return response()->json([
+                'message'          => true,
+                'new_activity_id'  => $newFld->activity_id,
+                'products_queued'  => $products->count(),
+            ]);
+
+        } catch (\Throwable $th) {
+            return response()->json(['message' => false, 'error' => $th->getMessage()], 500);
+        }
+    }
+
     public function triggerRenew(Request $request, $store_id)
     {
         $now = Carbon::now()->timestamp;

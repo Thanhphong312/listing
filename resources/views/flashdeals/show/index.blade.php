@@ -313,6 +313,11 @@
                                             <i class="fa fa-eye"></i>
                                         </button>
                                     </a>
+                                    <button class="btn btn-info btn-rounded btn-sm mt-1"
+                                        onclick="duplicateFld({{$flashdeal->id}})"
+                                        title="Duplicate FLD">
+                                        <i class="fa fa-copy"></i>
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach
@@ -570,6 +575,22 @@
                 }
             });
         }
+        function duplicateFld(id) {
+            if (!confirm('Duplicate flash deal #' + id + '? A new FLD will be created with the same products.')) return;
+            $.ajax({
+                url: '../duplicate-fld/' + id,
+                method: 'POST',
+                data: { _token: '{{ csrf_token() }}' },
+                success: function(res) {
+                    alert('Done! New activity_id: ' + res.new_activity_id + '\nProducts queued: ' + res.products_queued + '\nOld FLD deactivated.');
+                    location.reload();
+                },
+                error: function(xhr) {
+                    alert('Error: ' + (xhr.responseJSON?.error ?? xhr.statusText));
+                }
+            });
+        }
+
         function triggerRenew() {
             const btn = document.getElementById('triggerRenewBtn');
             btn.disabled = true;
