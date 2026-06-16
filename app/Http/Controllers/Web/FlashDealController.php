@@ -6,6 +6,7 @@ use EcomPHP\TiktokShop\Resources\Product;
 use Illuminate\Http\Request;
 use Vanguard\Http\Controllers\Controller;
 use Vanguard\Jobs\addProductFlashdealjob;
+use Vanguard\Jobs\RenewFlashDealJob;
 use Vanguard\Jobs\syncAllFlashDealJob;
 use Vanguard\Jobs\syncAllProductStoreFldJob;
 use Vanguard\Jobs\syncFlashDealJob;
@@ -471,6 +472,25 @@ class FlashDealController extends Controller
         $stores = Store::select('id', 'name_flashdeal')->where('create_flashdeal', 1)->get();
         return view('flashdeals.extention', compact('stores'));
     }
+    public function triggerRenew(Request $request, $store_id)
+    {
+        $now = Carbon::now()->timestamp;
+        $ids = FlashDeals::select('id')
+            ->where('store_id', $store_id)
+            ->whereIn('status_fld', ['ONGOING', 'NOT_START', 'EXPIRED'])
+            ->where('auto', 1)
+            ->where('end_time', '<=', $now)
+            ->where('renew', 0)
+            ->pluck('id')
+            ->toArray();
+
+        foreach ($ids as $id) {
+            RenewFlashDealJob::dispatch($id)->onQueue('renew-flashdeal');
+        }
+
+        return response()->json(['message' => true, 'dispatched' => count($ids), 'ids' => $ids]);
+    }
+
     public function changepriority(Request $request)
     {
         $flashdealproduct = ProductFlashdeals::find($request->id);

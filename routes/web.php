@@ -454,6 +454,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::any('/edit-all-product-tiktok', 'FlashDealController@editallproducttiktok')->name('editallproducttiktok');
         Route::any('/edit-all-product-flashdeal', 'FlashDealController@editallproductflashdeal')->name('editallproductflashdeal');
         Route::any('/changepriority', 'FlashDealController@changepriority')->name('changepriority');
+        Route::post('/trigger-renew/{store_id}', 'FlashDealController@triggerRenew')->name('trigger-renew');
 
     });
     Route::get('/new/{id}', 'TiktokController@test');

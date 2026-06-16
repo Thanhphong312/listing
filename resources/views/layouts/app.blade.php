@@ -43,6 +43,24 @@
         }
     </style>
     <style>
+        #timezonenowLosAngeles {
+            font-size: 16px;
+            /* Kích thước nhỏ hơn */
+            font-weight: normal;
+            color: #3498db;
+            /* Màu xanh nổi bật */
+            text-align: center;
+            margin: 0 auto;
+            /* Căn giữa */
+            padding: 5px;
+            border: 1px solid #3498db;
+            /* Viền mỏng hơn */
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            /* Màu nền rất nhẹ */
+            width: 200px;
+            /* Chiều rộng nhỏ hơn */
+        }
         #timezonenow {
             font-size: 16px;
             /* Kích thước nhỏ hơn */

@@ -152,6 +152,9 @@
             <div id="timezonenow">
 
             </div>
+            <div id="timezonenowLosAngeles">
+
+            </div>
             <div class="m-1">
                 <div class="row">
                     <div class="col-md-4">
@@ -164,6 +167,9 @@
                             onclick="sync_all_product('{{$store_id}}')">Sync
                             all product</button>
                         <button class="btn btn-primary mt-2" onclick="getproduct(1)">get product</button>
+                        <button type="button" class="btn btn-warning mt-2" id="triggerRenewBtn" onclick="triggerRenew()">
+                            <i class="fa fa-refresh"></i> Check &amp; Renew
+                        </button>
 
                     </div>
                     <div class="col-8">
@@ -333,13 +339,17 @@
             var now = new Date(); // Lấy giờ hiện tại
             var timeOptions = { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
             var dateOptions = { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' };
+            var dateOptionsLosAngeles = { timeZone: 'America/Los_Angeles', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
 
             // Lấy giờ và ngày theo múi giờ America/New_York
             var timeString = now.toLocaleTimeString('en-US', timeOptions);
             var dateString = now.toLocaleDateString('en-US', dateOptions);
+            var timeStringLosAngeles = now.toLocaleTimeString('en-US', dateOptionsLosAngeles);
+            var dateStringLosAngeles = now.toLocaleDateString('en-US', dateOptionsLosAngeles);
 
             // Hiển thị thời gian và ngày tháng năm trong div với id="timezonenow"
             document.getElementById('timezonenow').innerHTML = dateString + ' ' + timeString;
+            document.getElementById('timezonenowLosAngeles').innerHTML = dateStringLosAngeles ;
             document.getElementById('timezonenowfaddflashdeal').innerHTML = dateString + ' ' + timeString;
         }
 
@@ -560,6 +570,27 @@
                 }
             });
         }
+        function triggerRenew() {
+            const btn = document.getElementById('triggerRenewBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Checking...';
+            $.ajax({
+                url: '../trigger-renew/{{ $store_id }}',
+                method: 'POST',
+                data: { _token: '{{ csrf_token() }}' },
+                success: function(res) {
+                    alert('Dispatched ' + res.dispatched + ' renew job(s).' + (res.dispatched > 0 ? '\nIDs: ' + res.ids.join(', ') : ''));
+                },
+                error: function(xhr) {
+                    alert('Error: ' + xhr.statusText);
+                },
+                complete: function() {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa fa-refresh"></i> Check & Renew';
+                }
+            });
+        }
+
         function sync_flashdeal(id) {
             $.ajax({
                 url: '../sync-flash-deal/' + id,
