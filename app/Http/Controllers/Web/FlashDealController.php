@@ -524,24 +524,16 @@ class FlashDealController extends Controller
                 ]
             );
 
-            // Copy products từ FLD cũ sang FLD mới
+            // Chuyển product_flashdeal từ FLD cũ sang FLD mới (update flashdeal_id, reset status)
             $products = ProductFlashdeals::where('flashdeal_id', $original->activity_id)->get();
-            foreach ($products as $pf) {
-                ProductFlashdeals::updateOrCreate(
-                    [
-                        'flashdeal_id' => (string) $newFld->activity_id,
-                        'product_id'   => $pf->product_id,
-                    ],
-                    [
-                        'discount'          => $pf->discount,
-                        'quantity_limit'    => $pf->quantity_limit,
-                        'quantity_per_user' => $pf->quantity_per_user,
-                        'total_sku'         => $pf->total_sku,
-                        'message'           => '',
-                        'success'           => 0,
-                    ]
-                );
+            ProductFlashdeals::where('flashdeal_id', $original->activity_id)
+                ->update([
+                    'flashdeal_id' => (string) $newFld->activity_id,
+                    'message'      => '',
+                    'success'      => 0,
+                ]);
 
+            foreach ($products as $pf) {
                 addProductFlashdealjob::dispatch(
                     $original->store_id,
                     (string) $newFld->activity_id,
