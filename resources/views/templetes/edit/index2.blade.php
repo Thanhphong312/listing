@@ -168,10 +168,9 @@
                                         </div>
                                         
                                         <div class="col-2">
-                                            <select class="form-select" name="select_option_price" id="select_option_price" onchange="selectAddPrice(this)">
-                                                <option value="1" selected>1</option>
-                                                <option value="2">2</option>
-                                            </select>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPriceConvertModal()">
+                                                <i class="fa fa-cog"></i> Price Convert
+                                            </button>
                                         </div>
                                         <div class="col-1">
                                             <input type="text" class="form-control" id="priceedit" aria-describedby="emailHelp" placeholder="Enter price">
@@ -264,6 +263,36 @@
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.js"></script>
 
+<!-- Price Convert Modal -->
+<div class="modal fade" id="priceConvertModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Setup Price Convert</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Nhập mức cộng thêm vào giá gốc cho từng size.</p>
+                <div class="mb-3">
+                    <span class="mr-2">Preset:</span>
+                    <button type="button" class="btn btn-sm btn-outline-primary mr-1" onclick="loadPreset(0)">Preset 1 (0,1,2,3,4,5,6)</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadPreset(1)">Preset 2 (0,0,0,0,1,2,3)</button>
+                </div>
+                <table class="table table-sm table-bordered">
+                    <thead class="thead-light">
+                        <tr><th>Size</th><th>Price Add (+$)</th></tr>
+                    </thead>
+                    <tbody id="priceConvertBody"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="savePriceConvert()">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section('scripts')
 <script>
     let json = {!! $encodedJson !!};
@@ -284,6 +313,39 @@
     var VariantList = generateVariantList(varianttmp);
 
     const filter = ["All", "All", "All"];
+    var listpriceconvert = [[0, 1, 2, 3, 4, 5, 6], [0, 0, 0, 0, 1, 2, 3]]
+    let priceConvert = listpriceconvert[0]
+
+    function openPriceConvertModal() {
+        const sizeEntry = VariantList.find(v => v.key.toLowerCase() === 'size');
+        const sizes = sizeEntry ? sizeEntry.value.split(',').map(s => s.trim()) : [];
+        const tbody = document.getElementById('priceConvertBody');
+        tbody.innerHTML = '';
+        sizes.forEach(function(size, index) {
+            const val = priceConvert[index] !== undefined ? priceConvert[index] : 0;
+            tbody.innerHTML += `<tr>
+                <td class="align-middle"><strong>${size}</strong></td>
+                <td><input type="number" class="form-control form-control-sm price-convert-input" value="${val}" step="0.01" min="0"></td>
+            </tr>`;
+        });
+        $('#priceConvertModal').modal('show');
+    }
+
+    function loadPreset(index) {
+        const preset = listpriceconvert[index] || [];
+        const inputs = document.querySelectorAll('.price-convert-input');
+        inputs.forEach(function(input, i) {
+            input.value = preset[i] !== undefined ? preset[i] : 0;
+        });
+    }
+
+    function savePriceConvert() {
+        const inputs = document.querySelectorAll('.price-convert-input');
+        priceConvert = Array.from(inputs).map(input => parseFloat(input.value) || 0);
+        console.log('priceConvert updated:', priceConvert);
+        $('#priceConvertModal').modal('hide');
+    }
+
     createOptions();
     createtableVariant(varianttmp, filter);
 
@@ -973,7 +1035,8 @@
             extractedSize = sizeMatch[1];
         }
 
-        var sizetemp = ['XS','S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']
+        const _sizeEntry = VariantList.find(v => v.key.toLowerCase() === 'size');
+        var sizetemp = _sizeEntry ? _sizeEntry.value.split(',').map(s => s.trim().toUpperCase()) : []
         var index = sizetemp.indexOf(extractedSize)
         var totalPrice = parseFloat(price) + parseFloat(priceConvert[index]??0);
         return totalPrice.toFixed(2);

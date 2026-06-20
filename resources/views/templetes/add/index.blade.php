@@ -335,10 +335,9 @@
                                             </select>
                                         </div>
                                         <div class="col-md-2">
-                                            <select class="form-select" name="select_option_price" id="select_option_price" onchange="selectAddPrice(this)">
-                                                <option value="1" selected>1</option>
-                                                <option value="2">2</option>
-                                            </select>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPriceConvertModal()">
+                                                <i class="fa fa-cog"></i> Price Convert
+                                            </button>
                                         </div>
                                     </div>
                                 <input type="text" class="form-control col-1 ml-1 mt-2" id="priceedit"
@@ -428,6 +427,36 @@
     }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.js"></script>
+
+<!-- Price Convert Modal -->
+<div class="modal fade" id="priceConvertModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Setup Price Convert</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Nhập mức cộng thêm vào giá gốc cho từng size.</p>
+                <div class="mb-3">
+                    <span class="mr-2">Preset:</span>
+                    <button type="button" class="btn btn-sm btn-outline-primary mr-1" onclick="loadPreset(0)">Preset 1 (0,1,2,3,4,5,6)</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadPreset(1)">Preset 2 (0,0,0,1,2,3,4)</button>
+                </div>
+                <table class="table table-sm table-bordered">
+                    <thead class="thead-light">
+                        <tr><th>Size</th><th>Price Add (+$)</th></tr>
+                    </thead>
+                    <tbody id="priceConvertBody"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="savePriceConvert()">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section('scripts')
 <script>
@@ -678,9 +707,35 @@
     let selectedFiles = [];
     var listpriceconvert = [[0, 1, 2, 3, 4, 5, 6], [0, 0, 0, 1, 2, 3, 4]]
     let priceConvert = listpriceconvert[0]
-    function selectAddPrice(target) {
-        console.log(target.value);
-        priceConvert = listpriceconvert[target.value - 1]
+
+    function openPriceConvertModal() {
+        const sizes = sizeVariant.split(',').map(s => s.trim());
+        const tbody = document.getElementById('priceConvertBody');
+        tbody.innerHTML = '';
+        sizes.forEach(function(size, index) {
+            const val = priceConvert[index] !== undefined ? priceConvert[index] : 0;
+            tbody.innerHTML += `<tr>
+                <td class="align-middle"><strong>${size}</strong></td>
+                <td><input type="number" class="form-control form-control-sm price-convert-input" value="${val}" step="0.01" min="0"></td>
+            </tr>`;
+        });
+        $('#priceConvertModal').modal('show');
+    }
+
+    function loadPreset(index) {
+        const sizes = sizeVariant.split(',').map(s => s.trim());
+        const preset = listpriceconvert[index] || [];
+        const inputs = document.querySelectorAll('.price-convert-input');
+        inputs.forEach(function(input, i) {
+            input.value = preset[i] !== undefined ? preset[i] : 0;
+        });
+    }
+
+    function savePriceConvert() {
+        const inputs = document.querySelectorAll('.price-convert-input');
+        priceConvert = Array.from(inputs).map(input => parseFloat(input.value) || 0);
+        console.log('priceConvert updated:', priceConvert);
+        $('#priceConvertModal').modal('hide');
     }
     const description = `<div><strong>Welcome to the store!<br></strong>&nbsp;_ Experience unparalleled comfort and style with our versatile collection of hoodies, sweatshirts, and t-shirts. Crafted with a passion for providing the perfect shopping experience, our products are designed to keep you warm and cozy throughout the winter.<br><br></div><div>&nbsp;_ Feel free to explore a wide range of soft, comfy hoodies that are perfect for the season. We take pride in offering customization options, allowing you to choose your preferred color or even request a custom design. Should you have any questions or specific concerns, our dedicated team is always ready to assist – just drop us a message.<br><br></div><div>&nbsp;_ The standout feature of our products lies in the captivating images printed on the fabric using cutting-edge digital printing technology. Unlike embroidered designs, these images are seamlessly integrated, ensuring they neither peel off nor fade over time. Our hoodies, made from a blend of 50% cotton and 50% polyester, provide a classic fit with a double-lined hood and color-matched drawcord.<br><br></div><div>&nbsp;_ For those seeking premium shirts, our collection of soft, high-quality shirts is a perfect fit. Immerse yourself in 100% cotton shirts, available in various colors and styles. The innovative digital printing technology ensures that the vibrant images on these shirts remain intact for the long haul.<br><br></div><div>&nbsp;_ Embrace the winter chill with our warm sweatshirts, designed with your comfort in mind. The images are intricately printed using advanced digital technology, creating a lasting impression. The sweatshirts, featuring a classic fit and 1x1 rib with spandex, guarantee enhanced stretch and recovery.<br><br></div><div>&nbsp;_ Elevate your winter wardrobe with our curated selection of cozy and stylish apparel. Your satisfaction is our priority, and we look forward to making your shopping experience truly exceptional.<br><br></div><div>&nbsp;<strong>SIZE CHART</strong><figure data-trix-attachment=\"{&quot;contentType&quot;:&quot;image&quot;,&quot;height&quot;:422,&quot;url&quot;:&quot;https://lh7-rt.googleusercontent.com/docsz/AD_4nXcYWzTf9lQI-6q9WAfOVAyBsi2k5d8Sg761yGCaH8v9bcBIeU-h5TYr8qLa1VgImzcufQekU4U3Vk9Vcoi5tJCfoTox3U6nNP23ZjTGomEn_O1plUi482krLx5bq5avivsnUozwNQ?key=f1JtNQbLIQCKVVZiWjM_1g&quot;,&quot;width&quot;:549}\" data-trix-content-type=\"image\" class=\"attachment attachment--preview\"><img src=\"https://lh7-rt.googleusercontent.com/docsz/AD_4nXcYWzTf9lQI-6q9WAfOVAyBsi2k5d8Sg761yGCaH8v9bcBIeU-h5TYr8qLa1VgImzcufQekU4U3Vk9Vcoi5tJCfoTox3U6nNP23ZjTGomEn_O1plUi482krLx5bq5avivsnUozwNQ?key=f1JtNQbLIQCKVVZiWjM_1g\" width=\"549\" height=\"422\"><figcaption class=\"attachment__caption\"></figcaption></figure></div><div><strong>RETURNS OR EXCHANGES<br></strong><br></div><div>All of our shirts are custom printed so we do not accept returns or exchanges due to the sizing so please make sure you take all the steps to ensure you get the size you are wanting. However, if there are any issues with the shirt itself, please message us and we'd be happy to help correct the error.<br><br></div><div><strong>PRODUCTION AND SHIPPING<br></strong><br></div><div>Production: 1-3 days&nbsp;<br>Standard Shipping : 3-6 business days after production time<br><br></div><div><strong>THANK YOU<br></strong><br></div>`;
     // Set the value of the hidden input linked to Trix
@@ -1188,8 +1243,7 @@
             extractedSize = sizeMatch[1];
         }
 
-        // var priceConvert = [0, 1, 2, 3, 4, 5, 6]
-        var sizetemp = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']
+        var sizetemp = sizeVariant.split(',').map(s => s.trim().toUpperCase())
         var index = sizetemp.indexOf(extractedSize)
         var totalPrice = parseFloat(price) + parseFloat(priceConvert[index]);
         return totalPrice.toFixed(2);
