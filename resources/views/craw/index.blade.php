@@ -263,69 +263,65 @@
             }
         });
         document.getElementById('designs').addEventListener('change', function(event) {
-            let filePreview = document.getElementById('file-preview');
-
             Array.from(event.target.files).forEach(function(file) {
                 selectedFiles.push(file);
             });
+            renderFilePreview();
+        });
 
+        function renderFilePreview() {
+            const filePreview = document.getElementById('file-preview');
             filePreview.innerHTML = '';
 
-            if (selectedFiles.length > 0) {
-                let row = document.createElement('div');
-                row.classList.add('row'); // Create a Bootstrap row
-
-                selectedFiles.forEach(function(file, index) {
-                    let col = document.createElement('div');
-                    col.classList.add('col-md-3', 'mb-3',
-                        'position-relative'); // Column style with relative position for delete button
-
-                    if (file.type.startsWith('image/')) {
-                        let reader = new FileReader();
-                        reader.onload = function(e) {
-                            let image = new Image();
-                            image.src = e.target.result;
-                            image.classList.add(
-                                'img-fluid'); // Bootstrap class to make the image responsive
-                            image.style.objectFit = 'contain'; // Cover the fixed size
-                            image.style.backgroundColor = "#bdbdbd";
-                            image.style.width = '200px';
-                            image.style.height = '200px';
-
-                            let deleteBtn = document.createElement('button');
-                            deleteBtn.innerHTML = '<i class="fa fa-trash"></i>';
-                            deleteBtn.classList.add('btn', 'btn-danger', 'position-absolute', 'top-0',
-                                'end-0', 'm-1', 'p-1', 'btn-sm');
-                            deleteBtn.style.borderRadius = '50%';
-                            deleteBtn.style.padding = '5px';
-
-                            deleteBtn.addEventListener('click', function() {
-                                selectedFiles.splice(index,
-                                    1); // Remove the file from the array
-                                renderFilePreview(); // Re-render the preview
-                            });
-
-                            let filename = document.createElement('p');
-                            filename.classList.add('text-center', 'mt-2'); // Center the filename text
-                            filename.innerText = file.name;
-
-                            col.appendChild(image);
-                            col.appendChild(deleteBtn);
-                            col.appendChild(filename);
-                        };
-                        reader.readAsDataURL(file);
-                    }
-
-                    row.appendChild(col); // Append the column to the row
-                });
-
-                filePreview.appendChild(row); // Append the row to the file-preview section
-            } else {
+            if (selectedFiles.length === 0) {
                 filePreview.innerHTML = '<p>No files selected yet.</p>';
+                return;
             }
-            console.log("selectedFiles");
-            console.log(selectedFiles);
-        });
+
+            const row = document.createElement('div');
+            row.classList.add('row');
+
+            selectedFiles.forEach(function(file, index) {
+                const col = document.createElement('div');
+                col.classList.add('col-md-3', 'mb-3', 'position-relative');
+
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const image = new Image();
+                        image.src = e.target.result;
+                        image.classList.add('img-fluid');
+                        image.style.objectFit = 'contain';
+                        image.style.backgroundColor = '#bdbdbd';
+                        image.style.width = '200px';
+                        image.style.height = '200px';
+
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.innerHTML = '<i class="fa fa-trash"></i>';
+                        deleteBtn.classList.add('btn', 'btn-danger', 'position-absolute', 'top-0', 'end-0', 'm-1', 'p-1', 'btn-sm');
+                        deleteBtn.style.borderRadius = '50%';
+                        deleteBtn.style.padding = '5px';
+                        deleteBtn.addEventListener('click', function() {
+                            selectedFiles.splice(index, 1);
+                            renderFilePreview();
+                        });
+
+                        const filename = document.createElement('p');
+                        filename.classList.add('text-center', 'mt-2');
+                        filename.innerText = file.name;
+
+                        col.appendChild(image);
+                        col.appendChild(deleteBtn);
+                        col.appendChild(filename);
+                    };
+                    reader.readAsDataURL(file);
+                }
+
+                row.appendChild(col);
+            });
+
+            filePreview.appendChild(row);
+        }
         // Save button
         $('#saveBtn').click(function () {
             
