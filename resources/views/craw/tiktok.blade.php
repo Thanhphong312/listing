@@ -12,8 +12,8 @@
 <style>
     .thumbnail {
         width: 90%;
-        height: auto;
-        object-fit: cover;
+        height: 300px;
+        object-fit: contain;
         border: 2px solid transparent;
         cursor: pointer;
         transition: border 0.2s;
