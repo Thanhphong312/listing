@@ -14,7 +14,7 @@ use Vanguard\Models\Store\Store;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
-class PostProductToTiktokShop implements ShouldQueue, ShouldBeUnique
+class PostProductToTiktokShop implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

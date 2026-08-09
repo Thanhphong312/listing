@@ -140,12 +140,31 @@ class TiktokController extends Controller
     }
     public function test(Request $request, $id)
     {
-        phpinfo();
+        $store = Store::find(1);
+        $storetiktok = (new ConnectAppPartnerService())->connectAppPartner($store)['client'];
+        $product = $storetiktok->Product->searchProducts([
+            'status' => 'ACTIVATE'
+        ]);
+        dd($product);
+        // $now = Carbon::now()->timestamp; // Get current timestamp
+        // $renewflashdeals = FlashDeals::select('id')
+        //     ->whereIn('status_fld', ['ONGOING','NOT_START','EXPIRED'])
+        //     ->where('auto', 1)
+        //     ->where('end_time', '<=', $now) // Compare as timestamp
+        //     ->where('renew', 0)
+        //     ->pluck('id')
+        //     ->toArray();
+        // foreach ($renewflashdeals as $renewflashdeal) {
+        //     // dd($renewflashdeal);
+        //     RenewFlashDealJob::dispatch($renewflashdeal)->onQueue('renew-flashdeal');
+        // }
+        // dd($renewflashdeals);
+        // phpinfo();
         // $store = Store::find(1);
 
         // $store->syncfld = 1;
-        //     $storetiktok = (new ConnectAppPartnerService())->connectAppPartner($store)['client'];
-        //     $product = $storetiktok->Product->getProduct(1731815324732067903);
+            // $storetiktok = (new ConnectAppPartnerService())->connectAppPartner($store)['client'];
+            // $product = $storetiktok->Product->getProduct(1731815324732067903);
         //     dd($product);
         // $storeproducts = StoreProducts::WHERENULL('remote_id')->WhereNotNull('message')->get();
         // foreach($storeproducts as $storeproduct){
