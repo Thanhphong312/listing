@@ -351,6 +351,7 @@ class TiktokCrawlController extends Controller
             $createProduct = new Product();
             $createProduct->data = json_encode(['product' => $product]);
             $createProduct->templete_id = $templetes->id;
+            $createProduct->discount = $templetes->discount;
             $createProduct->user_id = Auth::user()->id;
             $createProduct->save();
         }
